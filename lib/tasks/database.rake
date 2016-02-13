@@ -1,6 +1,7 @@
 require 'yaml'
 require 'logger'
 require 'active_record'
+require 'active_support/inflector'
 
 namespace :db do
   def create_database config
@@ -31,6 +32,10 @@ namespace :db do
       end
     end
     puts "----> Created database #{config['database']}"
+  end
+
+  def template(file_name)
+    "class #{file_name.camelize} < ActiveRecord::Migration\n\n  def up\n  end\n\n  def down\n  end\n\nend"
   end
 
   task :configuration => :environment do
@@ -67,5 +72,19 @@ namespace :db do
   desc "Retrieves the current schema version number"
   task :version => :configure_connection do
     puts "Current version: #{ActiveRecord::Migrator.current_version}"
+  end
+
+  desc 'Generate an empty migration file'
+  task migration: :environment do
+    file_name = ARGV[1]
+    if file_name.nil?
+      puts '----> Need a file name (like "create_resource")'
+      exit 1
+    end
+    time = Time.now.to_i
+    File.open("#{MIGRATIONS_DIR}/#{time}_#{file_name}.rb", 'w') { |f|
+      f.write template(file_name)
+    }
+    exit 0
   end
 end
