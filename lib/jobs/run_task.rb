@@ -6,6 +6,11 @@ class RunTask
       break if Waitlist.empty?
       Waitlist.transaction do
         exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
+        # Should we build it with origin & mode pairs?
+        # So there's duplicates in origin IDs but not in the scope
+        # of [origin_id, mode]?
+        # Then mode can be an instance variable and we don't
+        # need a weird loop.
         @origin_id = Waitlist.first.destroy.id
       end
       # TODO design batching
