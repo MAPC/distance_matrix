@@ -10,4 +10,9 @@ class WaitlistTest < Minitest::Test
     assert @waiter.valid?
   end
 
+  def test_self_empty
+    assert_equal 0, Waitlist.count
+    assert Waitlist.empty?
+  end
+
 end

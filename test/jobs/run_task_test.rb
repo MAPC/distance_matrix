@@ -31,13 +31,29 @@ class RunTaskTest < Minitest::Test
     before = ApiKey.claimed.count
     @job.teardown!
     after = ApiKey.claimed.count
-    assert_equal -1, (after - before)
+    assert_equal(-1, (after - before))
   end
 
   def test_perform_adds_a_time
+    refute TravelTime.first.time
+    @job.perform!
+    assert TravelTime.first.time
+  end
+
+  def test_perform_assigns_times
+    # Once we have the mock requests
+    # assert_equal 1704107, TravelTime.first.time
     skip
   end
 
+  def test_releases_key_when_interrupted
+    skip 'Signal processing'
+  end
+
   def test_perform_releases_key_at_end
+    before = ApiKey.claimed.count
+    @job.perform!
+    after = ApiKey.claimed.count
+    assert_equal after, before
   end
 end

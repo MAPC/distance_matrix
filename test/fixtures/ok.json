@@ -1,0 +1,65 @@
+{
+
+  "destination_addresses":
+
+    [
+
+    "2-118 Malcolm X Blvd, Boston, MA 02120, USA",
+    "75 Federal St, Boston, MA 02110, USA"
+
+  ],
+  "origin_addresses": [
+
+    "193-259 Washington St, Boston, MA 02135, USA"
+
+  ],
+  "rows": [
+
+    {
+
+      "elements":
+
+        [
+
+        {
+
+          "distance":
+
+          {
+
+            "text": "6.8 km",
+            "value": 6846
+
+          },
+          "duration":
+
+          {
+            "text": "37 mins",
+            "value": 2228
+          },
+          "status": "OK"
+
+        }, {
+
+          "distance":
+
+          {
+
+            "text": "15.2 km",
+            "value": 15156
+
+          },
+          "duration":
+
+          {
+            "text": "29 mins",
+            "value": 1735
+          },
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+
+}

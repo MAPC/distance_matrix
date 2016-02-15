@@ -1,0 +1,38 @@
+{
+
+  "destination_addresses":
+
+    [
+
+    "43,-72",
+    "44,-73"
+
+  ],
+  "origin_addresses": [
+
+    "42,-71"
+
+  ],
+  "rows": [
+
+    {
+
+      "elements":
+
+        [
+
+        {
+
+          "status": "ZERO_RESULTS"
+
+        },
+
+        {
+          "status": "ZERO_RESULTS"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+
+}

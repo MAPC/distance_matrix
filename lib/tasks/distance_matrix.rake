@@ -20,10 +20,8 @@ namespace :task do
   desc 'Runs the task'
   task run: :environment do
     puts '----> Running task `task:run`'
-    puts "----> Database Environment: #{DATABASE_ENV}"
-    puts 'sleeping...'
-    sleep 2
-    puts '...finished!'
+    RunTask.new.perform!
+    puts '----> Exiting...'
     exit 0
   end
 end
