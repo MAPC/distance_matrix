@@ -11,6 +11,8 @@ class CreateTravelTimes < ActiveRecord::Migration
       t.decimal :y_origin, precision: 15, scale: 12
       t.decimal :x_destination, precision: 15, scale: 12
       t.decimal :y_destination, precision: 15, scale: 12
+      t.string  :travel_mode
+      t.integer :time
     end
   end
 
