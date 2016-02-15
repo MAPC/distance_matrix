@@ -52,4 +52,11 @@ class RetryingClientTest < Minitest::Test
     ENV['SLEEP_COST'] = '0'
   end
 
+  def test_sleeps_for_an_hour_when_over_limit
+    # ensure tests have more information, like a message
+    # or that there's a specific OverLimitError that inherits from
+    # GoogleApiError.
+    # First time, sleep 10 minutes, second time an hour, third time 6 hours
+  end
+
 end

@@ -58,7 +58,3 @@ class DistanceMatrixClient
   end
 
 end
-
-
-class ProductTooLargeError < StandardError ; end
-class GoogleApiError < StandardError ; end
