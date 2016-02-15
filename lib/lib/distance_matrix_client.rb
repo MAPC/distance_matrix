@@ -2,8 +2,9 @@ require 'httparty'
 
 class DistanceMatrixClient
   BASE_URI = 'https://maps.googleapis.com/maps/api/distancematrix/json'.freeze
-
   ARRIVAL_TIME = 1456407900.freeze # 25 Feb 2016 8:45 AM -5:00 HOLIDAY
+
+  attr_accessor :mode
 
   def initialize(origins: , destinations: , mode: , key: )
     @origins = Array(origins)
@@ -13,15 +14,20 @@ class DistanceMatrixClient
     @mode = mode.to_sym
   end
 
+  ERRORS = ['INVALID_REQUEST', 'MAX_ELEMENTS_EXCEEDED', 'OVER_QUERY_LIMIT',
+          'REQUEST_DENIED',  'UNKNOWN_ERROR'].freeze
+
   def results
-    JSON.parse(response.body)
+    results = JSON.parse(response.body)
+    raise GoogleApiError if ERRORS.include?(results['status'])
+    results
   end
 
   def options
     opts = { origins: origins, destinations: destinations,
           mode: @mode,  key: @key }
     opts.merge!({ arrival_time: ARRIVAL_TIME }) if opts[:mode] == :transit
-    opts
+    opts.sort_by { |k, _v| k.to_s }.to_h
   end
 
   def to_request
@@ -55,3 +61,4 @@ end
 
 
 class ProductTooLargeError < StandardError ; end
+class GoogleApiError < StandardError ; end

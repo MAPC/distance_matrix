@@ -1,4 +1,5 @@
 ENV['DATABASE_ENV'] = 'test'
+ENV['SLEEP_COST'] = '0'
 
 require 'minitest/autorun'
 require 'minitest/hell'

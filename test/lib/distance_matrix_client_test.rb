@@ -49,4 +49,17 @@ class DistanceMatrixClientTest < Minitest::Test
     assert results
     assert_equal 'OK', results['status']
   end
+
+  def test_raises_on_top_level_errors
+    DistanceMatrixClient::ERRORS.each do |error|
+      @client.mode = error
+      stub_request(:get, request_url(@client.mode)).
+        to_return(status: 200, body: '{"status": "' + error + '"}')
+      assert_raises(GoogleApiError) { @client.results }
+    end
+  end
+
+  def request_url(mode)
+    "https://maps.googleapis.com/maps/api/distancematrix/json?destinations=42.3315103,-71.0920196%7C42.3549005,-71.0563795%7C42.3549005,-71.0563795&key=key&mode=#{mode}&origins=42.3485086,-71.1493106"
+  end
 end
