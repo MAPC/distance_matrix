@@ -6,30 +6,17 @@ require 'active_support/inflector'
 namespace :db do
   def create_database config
     create_db = lambda do |config|
+      # Establish connection, but not to the database in use, by setting db: nil
       ActiveRecord::Base.establish_connection config.merge('database' => nil)
       ActiveRecord::Base.connection.create_database config['database']
+      # Then, establish the conection
       ActiveRecord::Base.establish_connection config
     end
 
     begin
       create_db.call config
-    rescue Mysql::Error => sqlerr
-      if sqlerr.errno == 1405
-        print "#{sqlerr.error}. \nPlease provide the root password for your mysql installation\n>"
-        root_password = $stdin.gets.strip
-
-        grant_statement = <<-SQL
-          GRANT ALL PRIVILEGES ON #{config['database']}.*
-            TO '#{config['username']}'@'localhost'
-            IDENTIFIED BY '#{config['password']}' WITH GRANT OPTION;
-        SQL
-
-        create_db.call config.merge('database' => nil, 'username' => 'root', 'password' => root_password)
-      else
-        $stderr.puts sqlerr.error
-        $stderr.puts "Couldn't create database for #{config.inspect}, charset: utf8, collation: utf8_unicode_ci"
-        $stderr.puts "(if you set the charset manually, make sure you have a matching collation)" if config['charset']
-      end
+    rescue StandardError => sqlerr
+      puts "ERROR CREATING DATABASE: #{sqlerr.message}"
     end
     puts "----> Created database #{config['database']}"
   end
@@ -54,6 +41,7 @@ namespace :db do
 
   desc 'Drops the database for the current DATABASE_ENV'
   task :drop => :configure_connection do
+    ActiveRecord::Base.establish_connection @config.merge('database' => nil)
     ActiveRecord::Base.connection.drop_database @config['database']
   end
 
