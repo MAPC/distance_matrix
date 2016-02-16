@@ -6,6 +6,7 @@ env:
   - DATABASE_ENV=test
 before_script:
   - bundle exec rake db:create db:migrate
+bundler_args: --without development
 cache: bundler
 addons:
   postgresql: '9.3'
