@@ -2,23 +2,7 @@ class RunTask
 
   def perform!
     boot!
-    loop do
-      break if Waitlist.empty?
-      Waitlist.transaction do
-        exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
-        # Should we build it with origin & mode pairs?
-        # So there's duplicates in origin IDs but not in the scope
-        # of [origin_id, mode]?
-        # Then mode can be an instance variable and we don't
-        # need a weird loop.
-        @origin_id = Waitlist.first.destroy.id
-      end
-      # TODO design batching
-      # BatchMaker.new(@origin_id).in_batches(of: 100) do |destinations, mode|
-        # Switch to keyword params, requiring :destinations
-        DistanceMatrix.new(@origin_id, mode, @key).results
-      # end
-    end
+    work!
     teardown!
   end
 
@@ -31,14 +15,36 @@ class RunTask
     end
   end
 
+  def work!
+    loop do
+      break if Waitlist.empty?
+      get_next_origin!
+      perform_distance_matrix!
+    end
+  rescue
+    teardown! # Release key if there's an error
+  end
+
   def teardown!
     @key.release!
   end
 
   private
 
-  def modes
-    [:transit, :walking]
+  def get_next_origin!
+    Waitlist.transaction do
+      exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
+      @origin_id = Waitlist.first.destroy.id
+    end
+  end
+
+  def perform_distance_matrix!
+    BatchMaker.new(@origin_id).in_batches(of: 100) do |records, mode|
+      destinations = records.map(&:destination)
+      DistanceMatrix.new( key: @key.token, mode: mode,
+        origins: [@origin], destinations: destinations
+      ).each_with_index { |d,i| records[i].update_attribute(:time, d) }
+    end
   end
 
   def exec(query)
