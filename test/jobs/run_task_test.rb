@@ -47,6 +47,10 @@ class RunTaskTest < Minitest::Test
     skip
   end
 
+  def test_perform_claims_all_waitlisters
+    assert_equal Waitlist.all.count, Waitlist.claimed.count
+  end
+
   def test_releases_key_when_interrupted
     skip 'Signal processing'
   end

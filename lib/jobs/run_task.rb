@@ -19,7 +19,7 @@ class RunTask
   def work!
     loop do
       break if Waitlist.empty?
-      get_next_origin!
+      get_next_origin
       perform_distance_matrix!
     end
   end
@@ -30,11 +30,11 @@ class RunTask
 
   private
 
-  def get_next_origin!
+  def get_next_origin
     Waitlist.transaction do
       exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
-      # TODO: Use boolean instead of destroying
-      @origin_id = Waitlist.first.destroy.id
+      @origin = Waitlist.available.first
+      @origin.claim!
     end
   end
 
