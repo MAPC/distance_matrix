@@ -1,3 +1,10 @@
+
+if ENV['CODECLIMATE_REPO_TOKEN']
+  require 'codeclimate-test-reporter'
+  CodeClimate::TestReporter.start
+  puts '----> Test coverage will be reported for this run.'
+end
+
 ENV['DATABASE_ENV'] = 'test'
 ENV['SLEEP_COST'] = '0'
 
@@ -7,12 +14,6 @@ require 'minitest/focus'
 require 'webmock/minitest'
 require 'active_record'
 require 'database_cleaner'
-
-if ENV['CODECLIMATE_REPO_TOKEN']
-  require 'codeclimate-test-reporter'
-  CodeClimate::TestReporter.start
-  puts '----> Test coverage will be reported for this run.'
-end
 
 DatabaseCleaner.strategy = :transaction
 
@@ -25,7 +26,7 @@ class Minitest::Spec
   end
 end
 
-MiniTest::Unit.after_run do
+MiniTest::Unit.after_tests do
   WebMock.disable_net_connect!(allow: %w{codeclimate.com})
 end
 
