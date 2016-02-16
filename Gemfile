@@ -21,3 +21,5 @@ gem 'guard-minitest'
 gem 'webmock'        # Ensure we don't query external services
 gem 'rb-fsevent', require: RUBY_PLATFORM.include?('darwin') && 'rb-fsevent'
 gem 'codeclimate-test-reporter' # Test coverage
+
+gem 'rake' # For Travis CI
