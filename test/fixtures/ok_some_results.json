@@ -1,0 +1,53 @@
+{
+
+  "destination_addresses":
+
+    [
+
+    "43,-72",
+    "44,-73"
+
+  ],
+  "origin_addresses": [
+
+    "42,-71"
+
+  ],
+  "rows": [
+
+    {
+
+      "elements":
+
+        [
+
+        {
+
+          "status": "ZERO_RESULTS"
+
+        },
+
+        {
+
+          "distance":
+
+          {
+
+            "text": "15.2 km",
+            "value": 15156
+
+          },
+          "duration":
+
+          {
+            "text": "29 mins",
+            "value": 1735
+          },
+          "status": "OK"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+
+}

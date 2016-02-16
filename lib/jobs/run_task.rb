@@ -3,6 +3,7 @@ class RunTask
   def perform!
     boot!
     work!
+  ensure
     teardown!
   end
 
@@ -21,8 +22,6 @@ class RunTask
       get_next_origin!
       perform_distance_matrix!
     end
-  rescue
-    teardown! # Release key if there's an error
   end
 
   def teardown!
@@ -34,16 +33,20 @@ class RunTask
   def get_next_origin!
     Waitlist.transaction do
       exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
+      # TODO: Use boolean instead of destroying
       @origin_id = Waitlist.first.destroy.id
     end
   end
 
   def perform_distance_matrix!
-    BatchMaker.new(@origin_id).in_batches(of: 100) do |records, mode|
+    BatchMaker.new(@origin_id).in_batches do |records, mode|
       destinations = records.map(&:destination)
-      DistanceMatrix.new( key: @key.token, mode: mode,
+      RetryingClient.new(
+        key: @key.token,    mode: mode,
         origins: [@origin], destinations: destinations
-      ).each_with_index { |d,i| records[i].update_attribute(:time, d) }
+      ).durations.each_with_index { |d,i|
+        records[i].update_attribute(:time, d)
+      }
     end
   end
 

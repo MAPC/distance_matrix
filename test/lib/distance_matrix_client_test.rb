@@ -50,6 +50,27 @@ class DistanceMatrixClientTest < Minitest::Test
     assert_equal 'OK', results['status']
   end
 
+  def test_durations
+    stub_request(:get, "https://maps.googleapis.com/maps/api/distancematrix/json?arrival_time=1456407900&destinations=42.3315103,-71.0920196%7C42.3549005,-71.0563795%7C42.3549005,-71.0563795&key=key&mode=transit&origins=42.3485086,-71.1493106").
+      to_return(status: 200, body: File.read('test/fixtures/ok.json'))
+    assert_respond_to @client, :durations
+    assert_equal [2228, 1735], @client.durations
+  end
+
+  def test_durations_with_no_elements
+    stub_request(:get, "https://maps.googleapis.com/maps/api/distancematrix/json?arrival_time=1456407900&destinations=42.3315103,-71.0920196%7C42.3549005,-71.0563795%7C42.3549005,-71.0563795&key=key&mode=transit&origins=42.3485086,-71.1493106").
+      to_return(status: 200, body: File.read('test/fixtures/ok_no_results.json'))
+    assert_respond_to @client, :durations
+    assert_equal [nil, nil], @client.durations
+  end
+
+  def test_durations_with_some_elements
+    stub_request(:get, "https://maps.googleapis.com/maps/api/distancematrix/json?arrival_time=1456407900&destinations=42.3315103,-71.0920196%7C42.3549005,-71.0563795%7C42.3549005,-71.0563795&key=key&mode=transit&origins=42.3485086,-71.1493106").
+      to_return(status: 200, body: File.read('test/fixtures/ok_some_results.json'))
+    assert_respond_to @client, :durations
+    assert_equal [nil, 1735], @client.durations
+  end
+
   def test_raises_on_top_level_errors
     DistanceMatrixClient::ERRORS.each do |error|
       @client.mode = error

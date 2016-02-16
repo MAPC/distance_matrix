@@ -15,12 +15,26 @@ class DistanceMatrixClient
   end
 
   ERRORS = ['INVALID_REQUEST', 'MAX_ELEMENTS_EXCEEDED', 'OVER_QUERY_LIMIT',
-          'REQUEST_DENIED',  'UNKNOWN_ERROR'].freeze
+            'REQUEST_DENIED',  'UNKNOWN_ERROR'].freeze
+
+  def durations
+    results['rows'].first['elements'].map{|e| e.fetch('duration', {}).fetch('value', nil) }
+  end
 
   def results
     results = JSON.parse(response.body)
     raise GoogleApiError if ERRORS.include?(results['status'])
     results
+  end
+
+  def response
+    Net::HTTP.get_response(to_request)
+  end
+
+  def to_request
+    uri = URI(BASE_URI)
+    uri.query = URI.encode_www_form(options)
+    uri
   end
 
   def options
@@ -30,22 +44,12 @@ class DistanceMatrixClient
     opts.sort_by { |k, _v| k.to_s }.to_h
   end
 
-  def to_request
-    uri = URI(BASE_URI)
-    uri.query = URI.encode_www_form(options)
-    uri
-  end
-
   def origins
     @origins.map{|e| e.map(&:to_f).join(',')}.join('|')
   end
 
   def destinations
     @destinations.map{|e| e.map(&:to_f).join(',')}.join('|')
-  end
-
-  def response
-    Net::HTTP.get_response(to_request)
   end
 
   private
