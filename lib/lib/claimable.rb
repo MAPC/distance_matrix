@@ -36,7 +36,7 @@ module Claimable
   end
 
   ERR_CLAIMED = <<-EOE
-    Key #{self} has already been claimed.
+    Key has already been claimed.
   EOE
 
 end
