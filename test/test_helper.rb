@@ -8,7 +8,7 @@ require 'webmock/minitest'
 require 'active_record'
 require 'database_cleaner'
 
-if ENV['COVERAGE'] && ENV['CODECLIMATE_REPO_TOKEN']
+if ENV['CODECLIMATE_REPO_TOKEN']
   require 'codeclimate-test-reporter'
   CodeClimate::TestReporter.start
   puts '----> Test coverage will be reported for this run.'

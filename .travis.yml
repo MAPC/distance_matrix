@@ -2,9 +2,11 @@ language: ruby
 sudo: false
 rvm:
   - 2.1.5
+env:
+  - DATABASE_ENV=test
 before_script:
   - psql -c 'create database distance_matrix_test;' -U postgres
-  - bundle exec rake db:create db:structure:load db:migrate
+  - bundle exec rake db:create db:migrate
 cache: bundler
 addons:
   postgresql: '9.3'
