@@ -14,7 +14,7 @@ class RetryingClient < DelegateClass(DistanceMatrixClient)
   def sleep_time(tries)
     cost = ENV.fetch('SLEEP_COST').to_i || 1
     attempts = 4 - tries
-    time = (attempts ** 3) * cost
+    (attempts ** 3) * cost
   end
 
 end
