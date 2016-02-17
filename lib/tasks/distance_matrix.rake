@@ -24,27 +24,6 @@ namespace :task do
 
   desc 'Statistics on tables'
   task stats: :environment do
-    # TODO: Migrate this into its own task.
-    taken_keys, free_keys, total_keys = ApiKey.claimed.count, ApiKey.available.count, ApiKey.count
-    waitlist, waiters, claimed = Waitlist.count, Waitlist.available.count, Waitlist.claimed.count
-    times_with_time = TravelTime.where.not(time: nil).count
-    distinct_origins = TravelTime.select(:target_id).distinct.count
-    times_total = TravelTime.count
-    pct_done = times_with_time / times_total.to_f * 100
-
-    msg = "\n"
-    msg << "Travel Times:\t #{times_with_time} complete of #{times_total} (#{pct_done}% done)"
-    msg << ", #{distinct_origins} distinct\n"
-    msg << "Waitlist:\t #{waiters} remaining of #{waitlist} total\n"
-    msg << "API Keys:\t #{taken_keys} claimed of #{total_keys} total (#{free_keys} free)\n"
-
-    if distinct_origins != waitlist
-      msg << "\n----> WARNING: Waitlist is not fully built, because the Waitlist"
-      msg << " should have the same number of records as distinct TravelTimes.\n"
-      msg << "----> Run `rake task:setup` to build the waitlist.\n"
-    end
-
-    msg << "\n"
-    puts msg
+    StatisticsTask.new.perform!
   end
 end
