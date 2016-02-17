@@ -1,33 +1,44 @@
+# Implicit yield using Proc.new from
+# http://mudge.name/2011/01/26/passing-blocks-in-ruby-without-block.html
+
 class BatchMaker
 
-  def intialize(origin_id: )
+  def initialize(origin_id: )
     @origin_id = origin_id
   end
 
   def in_batches(of: 100)
-    raise ProductTooLargeError if of.to_i > 100
+    @of = of.to_i
+    raise ProductTooLargeError if @of > 100
+    modes.each do |mode|
+      loop_over(mode: mode, &Proc.new)
+    end
+  end
+
+  private
+
+  def loop_over(mode: )
+    mode_scope = scope.where(travel_mode: mode)
+    count = mode_scope.count
     loop do
-      break if scope.count == 0
-      current_mode = scope.first.mode
-      scope.find_in_batches(batch_size: of.to_i) do |group|
-        yield(group, current_mode)
+      break if count == 0
+      mode_scope.find_in_batches(batch_size: @of) do |group|
+        count -= group.count
+        yield group, mode
       end
     end
   end
 
   def scope
-    base_scope.where(travel_mode: mode)
+    TravelTime.where(target_id: @origin_id).where(time: nil)
   end
 
-  def mode
-    # Get the mode of the first record, and use that for everything that follows.
-    base_scope.first.mode
+  def modes
+    [:transit, :walking]
+    # Get distinct modes from the database and memoize them.
+    # @modes ||= TravelTime.select(:travel_mode).distinct.map { |m|
+    #   m.travel_mode.to_sym
+    # }
   end
-
-  def base_scope
-    TravelTime.where(target_id: @origin_id).
-               where.not(time: nil)
-  end
-
 
 end
