@@ -52,16 +52,7 @@ class RetryingClientTest < Minitest::Test
     ENV['SLEEP_COST'] = '0'
   end
 
-  def test_sleep_cost
-    client = RetryingClient.new(nil)
-    ENV['SLEEP_COST'] = '1'
-    assert_equal 1,  client.sleep_time(3)
-    assert_equal 8,  client.sleep_time(2)
-    assert_equal 27, client.sleep_time(1)
-    ENV['SLEEP_COST'] = '0'
-  end
-
-  def test_sleep_cost
+  def test_sleep_cost_over_query_limit
     client = RetryingClient.new(nil)
     ENV['SLEEP_COST'] = '1'
     assert_equal 10800.seconds, client.over_limit_sleep_time(3)
