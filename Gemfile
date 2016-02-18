@@ -11,8 +11,6 @@ gem 'pg'             # Postgres
 
 gem 'foreman', require: false
 
-gem 'httparty'       # Web requests
-
 group :test do
   gem 'minitest'       # Test framework
   gem 'minitest-focus' # One test at a time

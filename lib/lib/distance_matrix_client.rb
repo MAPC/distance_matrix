@@ -1,4 +1,4 @@
-require 'httparty'
+require 'net/http'
 
 class DistanceMatrixClient
   BASE_URI = 'https://maps.googleapis.com/maps/api/distancematrix/json'.freeze
