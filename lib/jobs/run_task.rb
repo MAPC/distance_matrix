@@ -4,8 +4,7 @@ class RunTask
     boot!
     work!
   rescue Interrupt => e
-    puts '----> Exiting gracefully due to error or interrupt.'
-    puts "#{e.inspect}" if e
+    puts "----> Exiting RunTask gracefully due to #{e.inspect}."
   ensure
     teardown!
   end
@@ -25,7 +24,8 @@ class RunTask
         break if Waitlist.available.count == 0
         get_next_origin
         perform_distance_matrix!
-      rescue
+      rescue => e
+        puts "----> Error in work!: #{e.inspect}"
         @origin.release! if @origin
         raise
       end
@@ -47,16 +47,19 @@ class RunTask
   end
 
   def perform_distance_matrix!
-    BatchMaker.new(origin_id: @origin.origin_id).in_batches do |group, mode|
+    BatchMaker.new(origin_id: @origin.origin_id).in_batches(of: 50) do |group, mode|
       origin = TravelTime.find_by(input_id: @origin.origin_id).origin
       destinations = group.map(&:destination)
-      # TODO: Replace with RetryingClient, but it's returning a hash
-      # upon initialization, at the moment.
-      client_class = DistanceMatrixClient
-      RetryingClient.new(client_class.new(
+      puts "\n\n----> Working on next batch:"
+      puts "Origin:\t#{origin.inspect}"
+      puts "Destinations: \t#{destinations.first(5)}"
+      client = RetryingClient.new(DistanceMatrixClient.new(
         key: @key.token,    mode: mode,
         origins: [origin], destinations: destinations
-      )).durations.each_with_index { |d,i|
+      ))
+      puts '----> Requesting URL...'
+      puts "\t#{URI.unescape(client.to_request.to_s)}"
+      client.durations.each_with_index { |d,i|
         group[i].update_attribute(:time, d)
       }
     end

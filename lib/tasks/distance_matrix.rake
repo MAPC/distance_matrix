@@ -18,7 +18,7 @@ namespace :task do
   task run: :environment do
     puts "----> Running task `task:run` in #{DATABASE_ENV} environment"
     RunTask.new.perform!
-    puts '----> Exiting...'
+    puts '----> Exiting rake task...'
     exit 0
   end
 
