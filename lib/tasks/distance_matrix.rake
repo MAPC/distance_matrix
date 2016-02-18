@@ -16,7 +16,7 @@ namespace :task do
 
   desc 'Runs the task. Can be run concurrently by multiple workers.'
   task run: :environment do
-    puts "----> Running task `task:setup` in #{DATABASE_ENV} environment"
+    puts "----> Running task `task:run` in #{DATABASE_ENV} environment"
     RunTask.new.perform!
     puts '----> Exiting...'
     exit 0
