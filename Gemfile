@@ -2,14 +2,12 @@ source 'https://rubygems.org'
 
 ruby '2.1.5'
 
-gem 'json'
-gem 'logger'
 
 gem 'activerecord'   # Database
 gem 'activesupport'  # Inflectors, etc.
 gem 'pg'             # Postgres
 
-gem 'foreman', require: false
+gem 'logger'
 
 group :test do
   gem 'minitest'       # Test framework
