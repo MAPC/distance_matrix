@@ -3,6 +3,9 @@ class RunTask
   def perform!
     boot!
     work!
+  rescue Interrupt => e
+    puts '----> Exiting gracefully due to error or interrupt.'
+    puts "#{e.inspect}" if e
   ensure
     teardown!
   end
@@ -18,14 +21,19 @@ class RunTask
 
   def work!
     loop do
-      break if Waitlist.empty?
-      get_next_origin
-      perform_distance_matrix!
+      begin
+        break if Waitlist.available.count == 0
+        get_next_origin
+        perform_distance_matrix!
+      rescue
+        @origin.release! if @origin
+        raise
+      end
     end
   end
 
   def teardown!
-    @key.release!
+    @key.release! if @key
   end
 
   private
@@ -39,13 +47,17 @@ class RunTask
   end
 
   def perform_distance_matrix!
-    BatchMaker.new(@origin_id).in_batches do |records, mode|
-      destinations = records.map(&:destination)
-      RetryingClient.new(
+    BatchMaker.new(origin_id: @origin.origin_id).in_batches do |group, mode|
+      origin = TravelTime.find_by(input_id: @origin.origin_id).origin
+      destinations = group.map(&:destination)
+      # TODO: Replace with RetryingClient, but it's returning a hash
+      # upon initialization, at the moment.
+      client_class = DistanceMatrixClient
+      RetryingClient.new(client_class.new(
         key: @key.token,    mode: mode,
-        origins: [@origin], destinations: destinations
-      ).durations.each_with_index { |d,i|
-        records[i].update_attribute(:time, d)
+        origins: [origin], destinations: destinations
+      )).durations.each_with_index { |d,i|
+        group[i].update_attribute(:time, d)
       }
     end
   end

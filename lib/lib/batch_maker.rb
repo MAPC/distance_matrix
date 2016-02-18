@@ -30,7 +30,7 @@ class BatchMaker
   end
 
   def scope
-    TravelTime.where(target_id: @origin_id).where(time: nil)
+    TravelTime.where(input_id: @origin_id).where(time: nil)
   end
 
   def modes

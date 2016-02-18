@@ -5,13 +5,13 @@ class SetupTaskTest < Minitest::Test
   def setup
     @job = SetupTask.new
     10.times do |i|
-      10.times { TravelTime.create(target_id: (i+1)) }
+      10.times { TravelTime.create(input_id: (i+1)) }
     end
   end
 
   def teardown
     ids = (1..10).to_a
-    TravelTime.where(target_id: ids).destroy_all
+    TravelTime.where(input_id: ids).destroy_all
     Waitlist.where(origin_id: ids).destroy_all
   end
 

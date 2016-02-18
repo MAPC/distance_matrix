@@ -49,7 +49,7 @@ class StatisticsTask
   end
 
   def distinct_origins
-    TravelTime.select(:target_id).distinct.count
+    TravelTime.select(:input_id).distinct.count
   end
 
   def times_total

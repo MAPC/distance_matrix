@@ -4,12 +4,12 @@ class BatchMakerTest < Minitest::Test
 
   def setup
     @origin_id = 212038
-    5.times { TravelTime.create!(target_id: @origin_id, travel_mode: :transit) }
-    3.times { TravelTime.create!(target_id: @origin_id, travel_mode: :walking) }
+    5.times { TravelTime.create!(input_id: @origin_id, travel_mode: :transit) }
+    3.times { TravelTime.create!(input_id: @origin_id, travel_mode: :walking) }
   end
 
   def teardown
-    TravelTime.where(target_id: @origin_id).destroy_all
+    TravelTime.where(input_id: @origin_id).destroy_all
   end
 
   def test_limit

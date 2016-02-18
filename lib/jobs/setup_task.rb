@@ -4,7 +4,7 @@ class SetupTask
     Waitlist.transaction do
       exec 'LOCK TABLE waitlist IN ACCESS EXCLUSIVE MODE'
       Waitlist.destroy_all
-      exec "INSERT INTO waitlist (origin_id) SELECT DISTINCT target_id FROM #{travel_times}"
+      exec "INSERT INTO waitlist (origin_id) SELECT DISTINCT input_id FROM #{travel_times}"
     end
   end
 
