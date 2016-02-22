@@ -1,3 +1,5 @@
+require_relative '../lib/claimable'
+
 class Waitlist < ActiveRecord::Base
   self.table_name = 'waitlist'
 
