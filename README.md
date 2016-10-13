@@ -12,7 +12,7 @@ For our youth employment lottery project, we faced a problem: how do we find all
 
 Constraints:
 
-- We realized we couldn't use distance as a proxy, because distance does not correlate with travel time via public transit, and in places with inconsistent sidewalk access, overpasses, or large blocks, distance doesn't correlate with walking time.
+- We realized we couldn't use distance as a proxy, because distance does not correlate with travel time via public transit, and in places with inconsistent sidewalk access, overpasses, or large blocks, distance doesn't correlate with walking time. Example: From Central Square in Cambridge to Coolidge Corner, Brookline (2.4 miles) takes 33-42 minutes. From Central Square to Downtown Crossing (3.2 miles) takes 12 minutes.
 
 - We also wanted to feed travel time into a function and convert travel times to potential jobs to a overall "match score".
 
@@ -29,8 +29,6 @@ Solution:
 - [This codebase.] We run the crawler. It grabs an origin grid cell ID, locking it so that if we're running the task in multiple processes, no other process tries to work on that origin. It then crawls the Google Distance Matrix API, getting public transit and walking times in bulk and saving them to the database.
 
 - In our youth employment algorithm, we assign every applicant and job site to a grid cell. When we get travel times between an applicant and potential job sites, we get the travel times using the table we built up with this crawler. The 250m grid we use is close enough to be relatively accurate, and it saves us the time and API cost of having to look up exact directions between points.
-
-> Example: From Central Square in Cambridge to Coolidge Corner, Brookline (2.4 miles) takes 33-42 minutes. From Central Square to Downtown Crossing (3.2 miles) takes 12 minutes.
 
 
 ## Setup
