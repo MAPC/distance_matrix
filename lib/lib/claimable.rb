@@ -6,21 +6,21 @@ module Claimable
 
   module ClassMethods
     def claimed
-      where(claimed: true)
+      where claimed: true
     end
 
     def available
-      where(claimed: false)
+      where claimed: false
     end
   end
 
   def claim!
     assert_unclaimed
-    update_attribute(:claimed, true)
+    update_attribute :claimed, true
   end
 
   def release!
-    update_attribute(:claimed, false)
+    update_attribute :claimed, false
   end
 
   def available?

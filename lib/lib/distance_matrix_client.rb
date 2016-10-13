@@ -2,10 +2,14 @@ require 'net/http'
 
 class DistanceMatrixClient
   BASE_URI = 'https://maps.googleapis.com/maps/api/distancematrix/json'.freeze
-  ARRIVAL_TIME = 1456407900.freeze # 25 Feb 2016 8:45 AM -5:00 HOLIDAY
+
+  # 25 Feb 2016 8:45 AM -5:00 HOLIDAY
+  # TODO: Make this an environment variable with a default.
+  ARRIVAL_TIME = 1456407900.freeze
 
   attr_accessor :mode
 
+  # Called in jobs/run_task.rb
   def initialize(origins: , destinations: , mode: , key: )
     @origins = Array(origins)
     @destinations = Array(destinations)
@@ -14,11 +18,17 @@ class DistanceMatrixClient
     @mode = mode.to_sym
   end
 
-  ERRORS = ['INVALID_REQUEST', 'MAX_ELEMENTS_EXCEEDED', 'OVER_QUERY_LIMIT',
-            'REQUEST_DENIED',  'UNKNOWN_ERROR'].freeze
+  ERRORS = [
+    'INVALID_REQUEST',
+    'MAX_ELEMENTS_EXCEEDED',
+    'OVER_QUERY_LIMIT',
+    'REQUEST_DENIED',
+    'UNKNOWN_ERROR'
+  ].freeze
 
   def durations
-    results['rows'].first['elements'].map{|e| e.fetch('duration', {}).fetch('value', nil) }
+    results['rows'].first['elements'].
+      map { |e| e.fetch('duration', {}).fetch('value', nil) }
   end
 
   def results
@@ -38,18 +48,22 @@ class DistanceMatrixClient
   end
 
   def options
-    opts = { origins: origins, destinations: destinations,
-          mode: @mode,  key: @key }
+    opts = {
+      origins: origins,
+      destinations: destinations,
+      mode: @mode,
+      key: @key
+    }
     opts.merge!({ arrival_time: ARRIVAL_TIME }) if opts[:mode] == :transit
     opts.sort_by { |k, _v| k.to_s }.to_h
   end
 
   def origins
-    @origins.map{|e| e.map(&:to_f).join(',')}.join('|')
+    @origins.map { |e| e.map(&:to_f).join(',') }.join('|')
   end
 
   def destinations
-    @destinations.map{|e| e.map(&:to_f).join(',')}.join('|')
+    @destinations.map { |e| e.map(&:to_f).join(',') }.join('|')
   end
 
   private
